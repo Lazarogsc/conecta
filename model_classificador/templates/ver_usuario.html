@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ usuario.nome }} (@{{ usuario.username }}) | Conecta</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='logo.svg') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="tema-{{ current_user.tema|default('claro') }}">
+
+<a href="#user-content" class="skip-link">Pular para o conteúdo principal</a>
+
+<div class="app-container">
+    <aside class="sidebar" role="complementary" aria-label="Menu lateral">
+        <a href="{{ url_for('feed') }}" class="brand" style="text-decoration:none;">
+            <img src="{{ url_for('static', filename='logo.svg') }}" class="brand-logo" alt="Logo da rede social Conecta">
+            <h2 class="brand-name">Conecta</h2>
+        </a>
+        <nav class="nav-menu" aria-label="Navegação principal">
+            <a href="{{ url_for('feed') }}" class="nav-item">
+                <div class="nav-icon-wrapper" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L4 9v12h5v-7h6v7h5V9l-8-6z"></path></svg>
+                </div>
+                <span>Início</span>
+            </a>
+            <a href="{{ url_for('perfil') }}" class="nav-item">
+                <div class="nav-icon-wrapper" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+                <span>Meu Perfil</span>
+            </a>
+        </nav>
+    </aside>
+
+    <header class="top-header" role="banner">
+        <a href="{{ url_for('feed') }}" class="btn-back-header">Voltar</a>
+        <div class="header-actions">
+            <div class="profile-dropdown-wrapper">
+                <button class="btn-icon profile-btn" onclick="document.getElementById('profile-dropdown').classList.toggle('open')" aria-label="Menu do perfil" aria-expanded="false">
+                    <div class="avatar-mini" aria-hidden="true">{{ current_user.nome[0] | upper }}</div>
+                </button>
+                <div class="profile-dropdown" id="profile-dropdown" role="menu" aria-label="Opções do perfil">
+                    <a href="{{ url_for('perfil') }}" class="profile-dropdown-item" role="menuitem">Meu Perfil</a>
+                    <a href="{{ url_for('logout') }}" class="profile-dropdown-item profile-dropdown-logout" role="menuitem">Sair</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="feed-container" id="user-content" role="main">
+        <div class="user-profile-page">
+            <div class="profile-header-card">
+                <div class="profile-big-avatar">{{ usuario.nome[0] | upper }}</div>
+                <div class="profile-header-info">
+                    <h2>{{ usuario.nome }}</h2>
+                    <p class="profile-username">@{{ usuario.username }}{% if usuario.perfil_privado %} 🔒{% endif %}</p>
+                    <div class="profile-stats-row">
+                        <span><strong>{{ usuario.posts|length }}</strong> publicações</span>
+                        <span><strong>{{ usuario.followers_count() }}</strong> seguidores</span>
+                        <span><strong>{{ usuario.following_count() }}</strong> seguindo</span>
+                    </div>
+
+                    {% if usuario.id != current_user.id %}
+                        {% if current_user.is_following(usuario) %}
+                            <form action="{{ url_for('unfollow', user_id=usuario.id) }}" method="POST" style="margin-top:12px;">
+                                <button type="submit" class="btn-unfollow">Deixar de Seguir</button>
+                            </form>
+                        {% elif current_user.has_pending_request_to(usuario) %}
+                            <button class="btn-requested" disabled style="margin-top:12px;">🔒 Solicitado</button>
+                        {% else %}
+                            <form action="{{ url_for('seguir', user_id=usuario.id) }}" method="POST" style="margin-top:12px;">
+                                <button type="submit" class="btn-primary">{% if usuario.perfil_privado %}🔒 Solicitar{% else %}Seguir{% endif %}</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            {% set can_see = not usuario.perfil_privado or current_user.is_following(usuario) or usuario.id == current_user.id %}
+
+            <h3 class="section-title">Publicações</h3>
+
+            {% if not can_see %}
+                <div class="empty-state">
+                    <div class="empty-icon">🔒</div>
+                    <h3>Perfil Privado</h3>
+                    <p>Siga {{ usuario.nome.split(' ')[0] }} para ver as publicações.</p>
+                </div>
+            {% elif posts|length == 0 %}
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <h3>Nenhuma publicação ainda</h3>
+                    <p>{{ usuario.nome.split(' ')[0] }} ainda não publicou nada.</p>
+                </div>
+            {% else %}
+            {% for post in posts %}
+                <article class="post-card" id="post-{{ post.id }}">
+                    <div class="post-header">
+                        <div class="post-author-info">
+                            <div class="post-avatar">{{ post.author.nome[0] | upper }}</div>
+                            <div class="author-meta">
+                                <span class="post-author-name">{{ post.author.nome }}</span>
+                                <span class="post-username-time">@{{ post.author.username }} · {{ post.data_publicacao | timeago }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content"><p>{{ post.texto }}</p></div>
+                    <div class="post-stats">
+                        <div class="stat-item"><span id="likes-count-{{ post.id }}">{{ post.likes }}</span> curtidas</div>
+                        <div class="stat-item">{{ post.comments_count }} comentários</div>
+                    </div>
+                    <div class="post-footer">
+                        <button class="interaction-btn btn-like {% if current_user.id in post.likes_users %}active{% endif %}" onclick="likePost({{ post.id }}, this)" aria-label="{% if current_user.id in post.likes_users %}Descurtir{% else %}Curtir{% endif %} publicação" aria-pressed="{% if current_user.id in post.likes_users %}true{% else %}false{% endif %}">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="{% if current_user.id in post.likes_users %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            <span>{% if current_user.id in post.likes_users %}Curtido{% else %}Curtir{% endif %}</span>
+                        </button>
+                    </div>
+                </article>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<script>
+function likePost(postId, btn) {
+    fetch('/like/' + postId, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('likes-count-' + postId).innerText = data.likes;
+        const icon = btn.querySelector('svg');
+        const span = btn.querySelector('span');
+        if (data.action === 'liked') { btn.classList.add('active'); icon.setAttribute('fill','currentColor'); span.innerText='Curtido'; }
+        else { btn.classList.remove('active'); icon.setAttribute('fill','none'); span.innerText='Curtir'; }
+    });
+}
+</script>
+</body>
+</html>

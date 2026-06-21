@@ -1,0 +1,12 @@
+{
+  "versao": "4.0",
+  "modelo": "TfidfVectorizer(1,2) + LogisticRegression(class_weight=None, C=2.0)",
+  "threshold_adulto": 0.51,
+  "criterio_limiar": "menor limiar com especificidade OOF >= 0.99",
+  "cv_recall_adulto_argmax": 0.8376344086021505,
+  "cv_recall_adulto_std": 0.0500202294607011,
+  "n_amostras": 466,
+  "n_adulto": 154,
+  "n_infantil": 132,
+  "n_neutro": 180
+}

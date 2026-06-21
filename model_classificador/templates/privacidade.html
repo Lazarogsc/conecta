@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidade | Conecta</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='logo.svg') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="legal-page">
+    <div class="legal-header">
+        <a href="{{ url_for('feed') }}" class="legal-back">← Voltar</a>
+        <h1>Política de Privacidade</h1>
+        <p class="legal-subtitle">Última atualização: Março de 2026</p>
+    </div>
+
+    <div class="legal-content">
+        <section>
+            <h2>1. Introdução</h2>
+            <p>A <strong>Conecta</strong> é uma rede social comprometida com a proteção dos dados pessoais de seus usuários, em conformidade com a <strong>Lei Geral de Proteção de Dados Pessoais (LGPD – Lei nº 13.709/2018)</strong>. Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos suas informações.</p>
+        </section>
+
+        <section>
+            <h2>2. Dados Coletados</h2>
+            <p>Coletamos os seguintes dados pessoais, fornecidos diretamente por você no momento do cadastro:</p>
+            <ul>
+                <li><strong>Nome Completo:</strong> para identificação no perfil público.</li>
+                <li><strong>E-mail:</strong> para autenticação e recuperação de conta.</li>
+                <li><strong>Idade:</strong> para classificação etária e filtragem de conteúdo adulto.</li>
+                <li><strong>Senha:</strong> armazenada de forma criptografada (hash bcrypt), nunca em texto puro.</li>
+                <li><strong>Foto de Perfil:</strong> opcional, para personalização do perfil.</li>
+            </ul>
+            <p>Além disso, coletamos dados gerados pelo uso da plataforma:</p>
+            <ul>
+                <li>Publicações (textos) e classificações de moderação automática.</li>
+                <li>Informações de interações (curtidas, comentários, seguidores).</li>
+                <li>Registros de punições aplicadas pelo sistema de moderação.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>3. Finalidade do Tratamento</h2>
+            <p>Seus dados são tratados para as seguintes finalidades (Art. 7 da LGPD):</p>
+            <ul>
+                <li><strong>Prestação do serviço:</strong> fornecer a funcionalidade da rede social.</li>
+                <li><strong>Moderação de conteúdo:</strong> utilizar Inteligência Artificial para classificar conteúdos como "seguro" ou "adulto", protegendo menores de idade.</li>
+                <li><strong>Segurança:</strong> prevenir fraudes e garantir a integridade da plataforma.</li>
+                <li><strong>Proteção de menores:</strong> filtrar conteúdo impróprio e aplicar punições conforme o ECA.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>4. Base Legal (Art. 7, LGPD)</h2>
+            <ul>
+                <li><strong>Consentimento (Art. 7, I):</strong> fornecido no momento do cadastro.</li>
+                <li><strong>Execução de contrato (Art. 7, V):</strong> necessário para a prestação do serviço.</li>
+                <li><strong>Exercício regular de direitos (Art. 7, VI):</strong> para moderação e aplicação de regras.</li>
+                <li><strong>Proteção da vida e incolumidade física (Art. 7, VII):</strong> para proteger crianças e adolescentes de conteúdos inadequados.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>5. Tratamento de Dados de Menores</h2>
+            <div class="legal-highlight">
+                <p>⚠️ <strong>Atenção especial:</strong> Em conformidade com o <strong>Art. 14 da LGPD</strong>, o tratamento de dados pessoais de crianças e adolescentes é realizado em seu melhor interesse.</p>
+            </div>
+            <ul>
+                <li>Menores de 18 anos têm acesso restrito: conteúdos classificados como "adulto" são automaticamente filtrados.</li>
+                <li>Tentativas de publicar conteúdo adulto por menores resultam em suspensão temporária (5 minutos).</li>
+                <li>Todos os conteúdos são classificados por IA (modelo local) antes da publicação.</li>
+                <li>O consentimento para cadastro de menores de 12 anos deve ser fornecido pelos pais ou responsáveis legais.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>6. Direitos do Titular (Art. 18, LGPD)</h2>
+            <p>Você tem os seguintes direitos sobre seus dados pessoais:</p>
+            <ul>
+                <li>✅ <strong>Acesso:</strong> solicitar quais dados seus são armazenados.</li>
+                <li>✅ <strong>Correção:</strong> corrigir dados pessoais incompletos ou incorretos.</li>
+                <li>✅ <strong>Exclusão:</strong> solicitar a eliminação dos dados, quando aplicável.</li>
+                <li>✅ <strong>Portabilidade:</strong> receber seus dados em formato que permita transferência.</li>
+                <li>✅ <strong>Revogação do consentimento:</strong> retirar o consentimento a qualquer momento.</li>
+                <li>✅ <strong>Informação sobre compartilhamento:</strong> saber com quem seus dados são compartilhados.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>7. Armazenamento e Segurança</h2>
+            <ul>
+                <li>Os dados são armazenados em banco de dados SQLite local, protegido por medidas de segurança adequadas.</li>
+                <li>Senhas são criptografadas com <strong>bcrypt</strong>, impossibilitando recuperação do texto original.</li>
+                <li>O acesso ao sistema é controlado por autenticação via Flask-Login.</li>
+                <li>Arquivos enviados (fotos) são armazenados com nomes seguros (sanitizados).</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>8. Compartilhamento de Dados</h2>
+            <p>A Conecta <strong>não compartilha</strong> seus dados pessoais com terceiros, exceto:</p>
+            <ul>
+                <li>Quando exigido por lei ou ordem judicial.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>9. Contato</h2>
+            <p>Para exercer seus direitos ou tirar dúvidas sobre esta política, entre em contato com o Encarregado de Proteção de Dados (DPO) pelo e-mail: <strong>privacidade@conecta.app</strong></p>
+        </section>
+    </div>
+
+    <div class="legal-footer">
+        <a href="{{ url_for('termos') }}">Termos de Uso</a> • 
+        <a href="{{ url_for('seguranca') }}">Segurança</a> • 
+        <a href="{{ url_for('feed') }}">Voltar ao Feed</a>
+    </div>
+</div>
+</body>
+</html>

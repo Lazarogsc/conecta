@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro | Conecta</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='logo.svg') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+</head>
+<body>
+
+<a href="#register-form" class="skip-link">Pular para o formulário de cadastro</a>
+
+<main class="auth-wrapper" role="main">
+    <div class="auth-card">
+        <div class="auth-logo-area">
+            <img src="{{ url_for('static', filename='logo.svg') }}" alt="Logo da rede social Conecta" class="auth-logo-img">
+            <h1 class="auth-brand">Conecta</h1>
+        </div>
+        <p class="subtitle">Crie sua conta na rede social mais segura.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="auth-alert auth-alert-{{ category }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" id="register-form" aria-label="Formulário de cadastro">
+            <div class="input-group">
+                <label for="reg-nome">Nome Completo</label>
+                <input type="text" id="reg-nome" name="nome" placeholder="Seu nome completo" required autocomplete="name">
+            </div>
+
+            <div class="input-group">
+                <label for="reg-username">Nome de Usuário</label>
+                <div class="username-input-wrapper">
+                    <span class="username-prefix" aria-hidden="true">@</span>
+                    <input type="text" id="reg-username" name="username" placeholder="seu.usuario" pattern="[a-z0-9_.]{3,30}" title="Mínimo 3 caracteres, apenas letras minúsculas, números, ponto e underline" aria-describedby="username-hint" autocomplete="username">
+                </div>
+                <small class="input-hint" id="username-hint">Mínimo 3 caracteres. Ex: maria.silva</small>
+            </div>
+
+            <div class="input-group">
+                <label for="reg-email">E-mail</label>
+                <input type="email" id="reg-email" name="email" placeholder="nome@exemplo.com" required autocomplete="email">
+            </div>
+
+            <div class="input-group">
+                <label for="reg-idade">Sua Idade</label>
+                <input type="number" id="reg-idade" name="idade" placeholder="Ex: 15" min="1" max="120" required>
+            </div>
+
+            <div class="input-group">
+                <label for="senha">Senha</label>
+                <input type="password" name="senha" id="senha" placeholder="Crie uma senha forte" required minlength="8" autocomplete="new-password" aria-describedby="pwd-reqs">
+                <div class="password-requirements" id="pwd-reqs" aria-live="polite">
+                    <p class="req" id="req-len" aria-label="Requisito: mínimo 8 caracteres, não atendido">✗ Mínimo 8 caracteres</p>
+                    <p class="req" id="req-upper" aria-label="Requisito: uma letra maiúscula, não atendido">✗ Uma letra maiúscula</p>
+                    <p class="req" id="req-lower" aria-label="Requisito: uma letra minúscula, não atendido">✗ Uma letra minúscula</p>
+                    <p class="req" id="req-num" aria-label="Requisito: um número, não atendido">✗ Um número</p>
+                    <p class="req" id="req-special" aria-label="Requisito: um caractere especial, não atendido">✗ Um caractere especial (!@#$%...)</p>
+                </div>
+            </div>
+
+            <button type="submit">Cadastrar</button>
+        </form>
+
+        <p class="auth-footer">
+            Já possui uma conta?
+            <a href="{{ url_for('login') }}">Fazer login</a>
+        </p>
+    </div>
+</main>
+
+<script>
+const senha = document.getElementById('senha');
+const checks = {
+    'req-len': /.{8,}/,
+    'req-upper': /[A-Z]/,
+    'req-lower': /[a-z]/,
+    'req-num': /[0-9]/,
+    'req-special': /[!@#$%^&*()_+\-=\[\]{};:'",.<>?\/\\|`~]/
+};
+
+const reqLabels = {
+    'req-len': 'mínimo 8 caracteres',
+    'req-upper': 'uma letra maiúscula',
+    'req-lower': 'uma letra minúscula',
+    'req-num': 'um número',
+    'req-special': 'um caractere especial'
+};
+
+senha.addEventListener('input', function() {
+    const val = this.value;
+    for (const [id, regex] of Object.entries(checks)) {
+        const el = document.getElementById(id);
+        const met = regex.test(val);
+        if (met) {
+            el.classList.add('valid');
+            el.textContent = el.textContent.replace('✗', '✓');
+            el.setAttribute('aria-label', 'Requisito: ' + reqLabels[id] + ', atendido');
+        } else {
+            el.classList.remove('valid');
+            el.textContent = el.textContent.replace('✓', '✗');
+            el.setAttribute('aria-label', 'Requisito: ' + reqLabels[id] + ', não atendido');
+        }
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed | Conecta</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='logo.svg') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="tema-{{ current_user.tema|default('claro') }}">
+
+<a href="#main-feed" class="skip-link">Pular para o conteúdo principal</a>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" role="complementary" aria-label="Menu lateral">
+        <a href="{{ url_for('feed') }}" class="brand" style="text-decoration:none;">
+            <img src="{{ url_for('static', filename='logo.svg') }}" class="brand-logo" alt="Logo da rede social Conecta">
+            <h2 class="brand-name">Conecta</h2>
+        </a>
+
+        <nav class="nav-menu" aria-label="Navegação principal">
+            <a href="{{ url_for('feed') }}" class="nav-item active" aria-current="page">
+                <div class="nav-icon-wrapper" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L4 9v12h5v-7h6v7h5V9l-8-6z"></path></svg>
+                </div>
+                <span>Início</span>
+            </a>
+            <a href="{{ url_for('perfil') }}" class="nav-item">
+                <div class="nav-icon-wrapper" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+                <span>Meu Perfil</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Top Header -->
+    <header class="top-header" role="banner">
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Abrir menu de navegação" aria-expanded="false" id="mobile-menu-toggle">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <form class="search-bar" action="{{ url_for('busca') }}" method="GET" role="search" aria-label="Pesquisar na Conecta">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" name="q" placeholder="Pesquisar na Conecta..." value="{{ busca_query|default('') }}" autocomplete="off" aria-label="Campo de pesquisa">
+        </form>
+        <div class="header-actions">
+            <div class="notif-wrapper">
+                <button class="btn-icon" onclick="toggleNotifications()" aria-label="Notificações{% if notif_count > 0 %}, {{ notif_count }} não lidas{% endif %}" aria-expanded="false" id="notif-toggle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    {% if notif_count > 0 %}<span class="notification-dot" id="notif-dot" aria-hidden="true">{{ notif_count }}</span>{% endif %}
+                </button>
+                <div class="notif-dropdown" id="notif-dropdown" role="region" aria-label="Painel de notificações" aria-live="polite">
+                    <div class="notif-header">
+                        <h4>Notificações</h4>
+                        <button class="notif-mark-read" onclick="markAllRead()">Marcar como lidas</button>
+                    </div>
+                    <div class="notif-list" id="notif-list"><p class="notif-loading">Carregando...</p></div>
+                </div>
+            </div>
+
+            <!-- Profile dropdown -->
+            <div class="profile-dropdown-wrapper">
+                <button class="btn-icon profile-btn" onclick="toggleProfileMenu()" aria-label="Menu do perfil" aria-expanded="false" id="profile-menu-toggle">
+                    <div class="avatar-mini" aria-hidden="true">{{ current_user.nome[0] | upper }}</div>
+                </button>
+                <div class="profile-dropdown" id="profile-dropdown" role="menu" aria-label="Opções do perfil">
+                    <div class="profile-dropdown-header">
+                        <strong>{{ current_user.nome }}</strong>
+                        <span class="profile-dropdown-username">@{{ current_user.username }}</span>
+                    </div>
+                    <a href="{{ url_for('perfil') }}" class="profile-dropdown-item" role="menuitem">Meu Perfil</a>
+                    <a href="{{ url_for('logout') }}" class="profile-dropdown-item profile-dropdown-logout" role="menuitem">Sair</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Feed -->
+    <main class="feed-container" id="main-feed" role="main">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if busca_query is defined and busca_query %}
+            <div class="search-results-header">
+                <h3>Resultados para "{{ busca_query }}"</h3>
+                <a href="{{ url_for('feed') }}" class="btn-back-feed">← Voltar ao feed</a>
+            </div>
+            <div class="search-filters">
+                <a href="{{ url_for('busca', q=busca_query, filtro='tudo') }}" class="search-filter-btn {% if filtro|default('tudo') == 'tudo' %}active{% endif %}">Tudo</a>
+                <a href="{{ url_for('busca', q=busca_query, filtro='usuarios') }}" class="search-filter-btn {% if filtro|default('tudo') == 'usuarios' %}active{% endif %}">Usuários</a>
+                <a href="{{ url_for('busca', q=busca_query, filtro='publicacoes') }}" class="search-filter-btn {% if filtro|default('tudo') == 'publicacoes' %}active{% endif %}">Publicações</a>
+            </div>
+
+            {% if usuarios_encontrados is defined and usuarios_encontrados|length > 0 %}
+                <div class="search-users-results">
+                    {% for u in usuarios_encontrados %}
+                    <div class="search-user-card">
+                        <div class="search-user-avatar">{{ u.nome[0] | upper }}</div>
+                        <div class="search-user-info">
+                            <a href="{{ url_for('ver_usuario', username=u.username) }}" class="search-user-name">{{ u.nome }}</a>
+                            <span class="search-user-username">@{{ u.username }}</span>
+                        </div>
+                        {% if not current_user.is_following(u) and u.id != current_user.id %}
+                        <form action="{{ url_for('seguir', user_id=u.id) }}" method="POST" style="margin:0;">
+                            <button type="submit" class="btn-follow-sm">Seguir</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <div class="feed-layout">
+            <div class="feed-main-col">
+                <!-- Composer -->
+                <div class="composer-card">
+                    <form action="{{ url_for('publicar') }}" method="POST" aria-label="Criar nova publicação">
+                        <div class="composer-top">
+                            <div class="composer-avatar" aria-hidden="true">{{ current_user.nome[0] | upper }}</div>
+                            <label for="composer-textarea" class="sr-only">Escreva sua publicação</label>
+                            <textarea name="texto" id="composer-textarea" placeholder="No que você está pensando, {{ current_user.nome.split(' ')[0] }}?" required></textarea>
+                        </div>
+                        <div class="composer-actions">
+                            <div class="action-buttons"></div>
+                            <button type="submit" class="btn-primary">Publicar</button>
+                        </div>
+                    </form>
+                </div>
+
+                {% if posts|length == 0 %}
+                    <div class="empty-state">
+                        <div class="empty-icon">✨</div>
+                        <h3>{% if busca_query is defined and busca_query %}Nenhum resultado{% else %}Bem-vindo à Conecta!{% endif %}</h3>
+                        <p>{% if busca_query is defined and busca_query %}Tente outros termos.{% else %}Comece a seguir pessoas para ver novidades.{% endif %}</p>
+                    </div>
+                {% endif %}
+
+                {% for post in posts %}
+                    <article class="post-card" id="post-{{ post.id }}">
+                        <div class="post-header">
+                            <div class="post-author-info">
+                                <div class="post-avatar">
+                                    {% if post.author %}{{ post.author.nome[0] | upper }}{% else %}?{% endif %}
+                                </div>
+                                <div class="author-meta">
+                                    <span class="post-author-name">
+                                        {% if post.author %}
+                                            <a href="{{ url_for('ver_usuario', username=post.author.username) }}" style="color:inherit;text-decoration:none;">{{ post.author.nome }}</a>
+                                        {% else %}Desconhecido{% endif %}
+                                    </span>
+                                    <span class="post-username-time">
+                                        {% if post.author %}@{{ post.author.username }} · {% endif %}{{ post.data_publicacao | timeago }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="post-options">
+                                {% if post.classificacao_local == "adulto" %}
+                                    <div class="organic-badge tooltip" role="img" aria-label="Conteúdo classificado como adulto (+18)">+18<span class="tooltiptext">Conteúdo Adulto</span></div>
+                                {% endif %}
+                                {% if current_user.id == post.user_id %}
+                                    <form action="{{ url_for('apagar', post_id=post.id) }}" method="POST" style="margin:0;">
+                                        <button type="submit" class="post-delete-btn" aria-label="Apagar publicação" title="Apagar">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="post-content"><p>{{ post.texto }}</p></div>
+
+                        <div class="post-stats">
+                            <div class="stat-item"><span id="likes-count-{{ post.id }}">{{ post.likes }}</span> curtidas</div>
+                            <div class="stat-item"><span id="comments-count-{{ post.id }}">{{ post.comments_count }}</span> comentários</div>
+                        </div>
+
+                        <div class="post-footer" role="group" aria-label="Ações da publicação">
+                            <button class="interaction-btn btn-like {% if current_user.id in post.likes_users %}active{% endif %}" onclick="likePost({{ post.id }}, this)" aria-label="{% if current_user.id in post.likes_users %}Descurtir{% else %}Curtir{% endif %} publicação" aria-pressed="{% if current_user.id in post.likes_users %}true{% else %}false{% endif %}">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="{% if current_user.id in post.likes_users %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                <span>{% if current_user.id in post.likes_users %}Curtido{% else %}Curtir{% endif %}</span>
+                            </button>
+                            <button class="interaction-btn" onclick="toggleComments({{ post.id }})" aria-label="Comentar publicação" aria-expanded="false" id="toggle-comments-{{ post.id }}">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                <span>Comentar</span>
+                            </button>
+                            <button class="interaction-btn" onclick="sharePost({{ post.id }})" aria-label="Compartilhar publicação">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                <span>Compartilhar</span>
+                            </button>
+                        </div>
+
+                        <div class="comments-section" id="comments-section-{{ post.id }}" style="display:none;" role="region" aria-label="Comentários">
+                            <div class="comment-composer">
+                                <div class="comment-avatar-sm" aria-hidden="true">{{ current_user.nome[0] | upper }}</div>
+                                <label for="comment-input-{{ post.id }}" class="sr-only">Escreva um comentário</label>
+                                <input type="text" class="comment-input" id="comment-input-{{ post.id }}" placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter')submitComment({{ post.id }})">
+                                <button class="comment-send-btn" onclick="submitComment({{ post.id }})" aria-label="Enviar comentário">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                </button>
+                            </div>
+                            <div class="comments-list" id="comments-list-{{ post.id }}" aria-live="polite"></div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <!-- Sidebar Direita -->
+            <aside class="feed-sidebar-col" aria-label="Informações complementares">
+                <div class="widget trending-widget">
+                    <h3 class="widget-title">Publicações em Alta 🔥</h3>
+                    {% if trending and trending|length > 0 %}
+                        {% for post in trending %}
+                        <a href="{{ url_for('post_view', post_id=post.id) }}" class="trending-item-link">
+                            <div class="trending-item">
+                                <div class="trending-post-header">
+                                    <div class="trending-post-avatar">{{ post.author.nome[0] | upper if post.author else '?' }}</div>
+                                    <div class="trending-post-meta">
+                                        <span class="trending-post-name">{{ post.author.nome if post.author else 'Desconhecido' }}</span>
+                                        <span class="trending-post-time">{{ post.data_publicacao | timeago }}</span>
+                                    </div>
+                                </div>
+                                <p class="trending-post-text">{{ post.texto[:80] }}{% if post.texto|length > 80 %}...{% endif %}</p>
+                                <div class="trending-post-stats">
+                                    <span>❤️ {{ post.likes }}</span>
+                                    <span>💬 {{ post.comments_count }}</span>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="trending-empty">
+                            <p>Nenhuma publicação em alta ainda.</p>
+                            <p style="font-size:0.82rem; margin-top:4px;">Publique e interaja!</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="widget suggestion-widget">
+                    <h3 class="widget-title">Pessoas interessantes</h3>
+                    {% if sugestoes %}
+                        {% for sug in sugestoes %}
+                            <div class="suggestion-card">
+                                <div class="suggestion-info">
+                                    <div class="suggestion-avatar">{{ sug.nome[0] | upper }}</div>
+                                    <div class="suggestion-details">
+                                        <a href="{{ url_for('ver_usuario', username=sug.username) }}" class="sug-name">{{ sug.nome }}</a>
+                                        <p class="sug-meta">@{{ sug.username }}</p>
+                                    </div>
+                                </div>
+                                {% if current_user.has_pending_request_to(sug) %}
+                                    <button class="btn-follow btn-requested" disabled>Solicitado</button>
+                                {% else %}
+                                    <form action="{{ url_for('seguir', user_id=sug.id) }}" method="POST" style="margin:0;">
+                                        <button type="submit" class="btn-follow">Seguir</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted" style="font-size:0.9rem;">Você já conhece todo mundo!</p>
+                    {% endif %}
+                </div>
+
+                <nav class="footer-links" aria-label="Links legais">
+                    <a href="{{ url_for('privacidade') }}">Privacidade</a> •
+                    <a href="{{ url_for('termos') }}">Termos</a> •
+                    <a href="{{ url_for('seguranca') }}">Segurança</a><br>
+                    <span>Conecta © 2026</span>
+                </nav>
+            </aside>
+        </div>
+    </main>
+</div>
+
+<div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileMenu()"></div>
+
+<!-- Share Modal -->
+<div class="share-modal-overlay" id="share-modal" style="display:none;" onclick="if(event.target===this)closeShareModal()" role="dialog" aria-modal="true" aria-label="Compartilhar publicação">
+    <div class="share-modal">
+        <h3>Compartilhar</h3>
+        <button class="share-option" onclick="shareWhatsApp()" aria-label="Compartilhar via WhatsApp">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.625-1.469A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.003 0-3.869-.59-5.432-1.603l-.389-.232-2.745.872.836-2.653-.254-.406A9.93 9.93 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+            WhatsApp
+        </button>
+        <button class="share-option" onclick="copyLink()" aria-label="Copiar link da publicação">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            Copiar Link
+        </button>
+        <button class="share-option share-cancel" onclick="closeShareModal()">Cancelar</button>
+    </div>
+</div>
+
+<div class="share-toast" id="share-toast">Link copiado! 📋</div>
+
+<script>
+let currentSharePostId = null;
+
+// ─── Like ────────────────────────────────────────────────────────
+function likePost(postId, btn) {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    fetch('/like/' + postId, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('likes-count-' + postId).innerText = data.likes;
+        const icon = btn.querySelector('svg');
+        const span = btn.querySelector('span');
+        if (data.action === 'liked') {
+            btn.classList.add('active');
+            icon.setAttribute('fill', 'currentColor');
+            span.innerText = 'Curtido';
+        } else {
+            btn.classList.remove('active');
+            icon.setAttribute('fill', 'none');
+            span.innerText = 'Curtir';
+        }
+    })
+    .finally(() => { btn.disabled = false; });
+}
+
+// ─── Comentários ─────────────────────────────────────────────────
+function toggleComments(postId) {
+    const s = document.getElementById('comments-section-' + postId);
+    const btn = document.getElementById('toggle-comments-' + postId);
+    if (s.style.display === 'none') {
+        s.style.display = 'block';
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+        loadComments(postId);
+        setTimeout(() => document.getElementById('comment-input-' + postId).focus(), 100);
+    } else {
+        s.style.display = 'none';
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+}
+
+function loadComments(postId) {
+    fetch('/comments/' + postId).then(r => r.json()).then(comments => {
+        const list = document.getElementById('comments-list-' + postId);
+        if (comments.length === 0) {
+            list.innerHTML = '<p class="no-comments">Seja o primeiro a comentar! 💬</p>';
+            return;
+        }
+        list.innerHTML = comments.map(c => renderComment(c, postId)).join('');
+    });
+}
+
+function renderComment(c, postId) {
+    const likedClass = c.liked_by_me ? 'comment-liked' : '';
+    const repliesHtml = c.replies ? c.replies.map(r => renderComment(r, postId)).join('') : '';
+    return `
+    <div class="comment-item" id="comment-${c.id}">
+        <div class="comment-main">
+            <div class="comment-avatar-sm">${c.author_inicial}</div>
+            <div class="comment-body">
+                <div class="comment-bubble">
+                    <span class="comment-author">${c.author_nome} <span class="comment-username">@${c.author_username || ''}</span></span>
+                    <p class="comment-text">${c.texto}</p>
+                </div>
+                <div class="comment-actions-row">
+                    <span class="comment-time">${c.data}</span>
+                    <button class="comment-action-btn ${likedClass}" onclick="likeComment(${c.id}, this)">❤️ ${c.likes > 0 ? c.likes : ''} Curtir</button>
+                    <button class="comment-action-btn" onclick="showReplyInput(${c.id}, ${postId})">Responder</button>
+                </div>
+                <div class="reply-input-area" id="reply-area-${c.id}" style="display:none;">
+                    <input type="text" class="comment-input reply-input" id="reply-input-${c.id}" placeholder="Responder..." onkeydown="if(event.key==='Enter')submitReply(${c.id}, ${postId})">
+                    <button class="comment-send-btn" onclick="submitReply(${c.id}, ${postId})">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+                ${repliesHtml ? '<div class="comment-replies">' + repliesHtml + '</div>' : ''}
+            </div>
+        </div>
+    </div>`;
+}
+
+function submitComment(postId) {
+    const input = document.getElementById('comment-input-' + postId);
+    const texto = input.value.trim();
+    if (!texto) return;
+    input.disabled = true;
+    const formData = new FormData();
+    formData.append('texto', texto);
+    fetch('/comment/' + postId, { method: 'POST', body: formData })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(data.error); return; }
+        input.value = '';
+        loadComments(postId);
+        document.getElementById('comments-count-' + postId).innerText = data.comments_count;
+    })
+    .finally(() => { input.disabled = false; });
+}
+
+function showReplyInput(commentId) {
+    const area = document.getElementById('reply-area-' + commentId);
+    area.style.display = area.style.display === 'none' ? 'flex' : 'none';
+    if (area.style.display === 'flex') document.getElementById('reply-input-' + commentId).focus();
+}
+
+function submitReply(commentId, postId) {
+    const input = document.getElementById('reply-input-' + commentId);
+    const texto = input.value.trim();
+    if (!texto) return;
+    input.disabled = true;
+    const formData = new FormData();
+    formData.append('texto', texto);
+    fetch('/comment/reply/' + commentId, { method: 'POST', body: formData })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(data.error); return; }
+        input.value = '';
+        document.getElementById('reply-area-' + commentId).style.display = 'none';
+        loadComments(postId);
+        document.getElementById('comments-count-' + postId).innerText = data.comments_count;
+    })
+    .finally(() => { input.disabled = false; });
+}
+
+function likeComment(commentId, btn) {
+    fetch('/comment/like/' + commentId, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+        if (data.action === 'liked') btn.classList.add('comment-liked');
+        else btn.classList.remove('comment-liked');
+        btn.innerHTML = `❤️ ${data.likes > 0 ? data.likes : ''} Curtir`;
+    });
+}
+
+// ─── Share ────────────────────────────────────────────────────────
+function sharePost(postId) {
+    currentSharePostId = postId;
+    document.getElementById('share-modal').style.display = 'flex';
+}
+
+function closeShareModal() {
+    document.getElementById('share-modal').style.display = 'none';
+}
+
+function shareWhatsApp() {
+    const url = window.location.origin + '/post/' + currentSharePostId;
+    window.open('https://wa.me/?text=' + encodeURIComponent('Confira esta publicação na Conecta! ' + url), '_blank');
+    closeShareModal();
+}
+
+function copyLink() {
+    const url = window.location.origin + '/post/' + currentSharePostId;
+    navigator.clipboard.writeText(url).then(() => {
+        closeShareModal();
+        const toast = document.getElementById('share-toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    });
+}
+
+// ─── Notifications ───────────────────────────────────────────────
+let notifOpen = false;
+function toggleNotifications() {
+    notifOpen = !notifOpen;
+    document.getElementById('notif-dropdown').classList.toggle('open', notifOpen);
+    document.getElementById('notif-toggle').setAttribute('aria-expanded', notifOpen);
+    if (notifOpen) loadNotifications();
+}
+
+document.addEventListener('click', function(e) {
+    const w = document.querySelector('.notif-wrapper');
+    if (w && !w.contains(e.target)) { document.getElementById('notif-dropdown').classList.remove('open'); notifOpen = false; }
+    const pw = document.querySelector('.profile-dropdown-wrapper');
+    if (pw && !pw.contains(e.target)) { document.getElementById('profile-dropdown').classList.remove('open'); }
+});
+
+function loadNotifications() {
+    fetch('/notificacoes').then(r => r.json()).then(notifs => {
+        const list = document.getElementById('notif-list');
+        if (notifs.length === 0) { list.innerHTML = '<p class="notif-empty">Nenhuma notificação 🔔</p>'; return; }
+        list.innerHTML = notifs.map(n => `
+            <div class="notif-item ${n.lida ? '' : 'notif-unread'}" data-notif-id="${n.id}">
+                <p class="notif-msg">${n.mensagem}</p>
+                <span class="notif-time">${n.data}</span>
+                ${n.link ? `<a href="${n.link}" class="notif-link-btn" onclick="markNotifRead(event, ${n.id})">Ver</a>` : ''}
+            </div>
+        `).join('');
+    });
+}
+
+function markNotifRead(event, notifId) {
+    event.preventDefault();
+    const link = event.target.getAttribute('href');
+    fetch('/notificacoes/ler/' + notifId, { method: 'POST' }).then(() => {
+        const item = document.querySelector(`[data-notif-id="${notifId}"]`);
+        if (item) item.classList.remove('notif-unread');
+        // Atualizar counter
+        const dot = document.getElementById('notif-dot');
+        if (dot) {
+            let count = parseInt(dot.innerText) - 1;
+            if (count <= 0) { dot.remove(); }
+            else { dot.innerText = count; }
+        }
+        window.location.href = link;
+    });
+}
+
+function markAllRead() {
+    fetch('/notificacoes/ler', { method: 'POST' }).then(() => {
+        const dot = document.getElementById('notif-dot');
+        if (dot) dot.remove();
+        document.querySelectorAll('.notif-unread').forEach(el => el.classList.remove('notif-unread'));
+    });
+}
+
+// ─── Profile Dropdown ────────────────────────────────────────────
+function toggleProfileMenu() {
+    const dd = document.getElementById('profile-dropdown');
+    const isOpen = dd.classList.toggle('open');
+    document.getElementById('profile-menu-toggle').setAttribute('aria-expanded', isOpen);
+}
+
+// ─── Mobile Menu ─────────────────────────────────────────────────
+function toggleMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const isOpen = sidebar.classList.toggle('mobile-open');
+    document.getElementById('mobile-overlay').classList.toggle('show');
+    const btn = document.getElementById('mobile-menu-toggle');
+    if (btn) btn.setAttribute('aria-expanded', isOpen);
+}
+</script>
+
+</body>
+</html>

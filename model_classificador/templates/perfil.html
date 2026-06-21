@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil | Conecta</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='logo.svg') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="tema-{{ current_user.tema|default('claro') }}">
+
+<a href="#perfil-content" class="skip-link">Pular para o conteúdo principal</a>
+
+<div class="app-container">
+    <aside class="sidebar" role="complementary" aria-label="Menu lateral">
+        <a href="{{ url_for('feed') }}" class="brand" style="text-decoration:none;">
+            <img src="{{ url_for('static', filename='logo.svg') }}" class="brand-logo" alt="Logo da rede social Conecta">
+            <h2 class="brand-name">Conecta</h2>
+        </a>
+        <nav class="nav-menu" aria-label="Navegação principal">
+            <a href="{{ url_for('feed') }}" class="nav-item">
+                <div class="nav-icon-wrapper" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L4 9v12h5v-7h6v7h5V9l-8-6z"></path></svg>
+                </div>
+                <span>Início</span>
+            </a>
+            <a href="{{ url_for('perfil') }}" class="nav-item active" aria-current="page">
+                <div class="nav-icon-wrapper" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+                <span>Meu Perfil</span>
+            </a>
+        </nav>
+    </aside>
+
+    <header class="top-header" role="banner">
+        <a href="{{ url_for('feed') }}" class="btn-back-header">Voltar ao Feed</a>
+        <div class="header-actions">
+            <div class="profile-dropdown-wrapper">
+                <button class="btn-icon profile-btn" onclick="document.getElementById('profile-dropdown').classList.toggle('open')" aria-label="Menu do perfil" aria-expanded="false">
+                    <div class="avatar-mini" aria-hidden="true">{{ current_user.nome[0] | upper }}</div>
+                </button>
+                <div class="profile-dropdown" id="profile-dropdown" role="menu" aria-label="Opções do perfil">
+                    <a href="{{ url_for('perfil') }}" class="profile-dropdown-item" role="menuitem">Meu Perfil</a>
+                    <a href="{{ url_for('logout') }}" class="profile-dropdown-item profile-dropdown-logout" role="menuitem">Sair</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="feed-container" id="perfil-content" role="main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="user-profile-page">
+            <!-- Profile Header -->
+            <div class="profile-header-card">
+                <div class="profile-big-avatar">{{ current_user.nome[0] | upper }}</div>
+                <div class="profile-header-info">
+                    <h2>{{ current_user.nome }}</h2>
+                    <p class="profile-username">@{{ current_user.username }}</p>
+                    <p class="profile-age">{{ current_user.idade }} anos</p>
+                    <div class="profile-stats-row">
+                        <span><strong>{{ meus_posts|length }}</strong> publicações</span>
+                        <span><strong>{{ seguidores|length }}</strong> seguidores</span>
+                        <span><strong>{{ seguindo|length }}</strong> seguindo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="profile-tabs" role="tablist" aria-label="Seções do perfil">
+                <button class="profile-tab active" onclick="showTab('posts')" role="tab" aria-selected="true" aria-controls="tab-posts" id="tabBtn-posts">Publicações</button>
+                <button class="profile-tab" onclick="showTab('seguidores')" role="tab" aria-selected="false" aria-controls="tab-seguidores" id="tabBtn-seguidores">Seguidores</button>
+                <button class="profile-tab" onclick="showTab('seguindo')" role="tab" aria-selected="false" aria-controls="tab-seguindo" id="tabBtn-seguindo">Seguindo</button>
+                <button class="profile-tab" onclick="showTab('solicitacoes')" id="tab-btn-solicitacoes" role="tab" aria-selected="false" aria-controls="tab-solicitacoes">
+                    Solicitações
+                    {% if current_user.pending_requests_count() > 0 %}
+                        <span class="tab-badge" aria-label="{{ current_user.pending_requests_count() }} solicitações pendentes">{{ current_user.pending_requests_count() }}</span>
+                    {% endif %}
+                </button>
+                <button class="profile-tab" onclick="showTab('config')" role="tab" aria-selected="false" aria-controls="tab-config" id="tabBtn-config">Configurações</button>
+            </div>
+
+            <!-- Tab: Posts -->
+            <div class="tab-content" id="tab-posts" role="tabpanel" aria-labelledby="tabBtn-posts">
+                {% if meus_posts|length == 0 %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3>Nenhuma publicação</h3>
+                        <p>Você ainda não publicou nada. <a href="{{ url_for('feed') }}">Comece agora!</a></p>
+                    </div>
+                {% endif %}
+                {% for post in meus_posts %}
+                    <article class="post-card">
+                        <div class="post-header">
+                            <div class="post-author-info">
+                                <div class="post-avatar">{{ current_user.nome[0] | upper }}</div>
+                                <div class="author-meta">
+                                    <span class="post-author-name">{{ current_user.nome }}</span>
+                                    <span class="post-username-time">@{{ current_user.username }} · {{ post.data_publicacao | timeago }}</span>
+                                </div>
+                            </div>
+                            <div class="post-options">
+                                {% if post.classificacao_local == "adulto" %}
+                                    <div class="organic-badge">+18</div>
+                                {% endif %}
+                                <form action="{{ url_for('apagar', post_id=post.id) }}" method="POST" style="margin:0;">
+                                    <button type="submit" class="post-delete-btn" title="Apagar">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="post-content"><p>{{ post.texto }}</p></div>
+                        <div class="post-stats">
+                            <span>{{ post.likes }} curtidas</span> · <span>{{ post.comments_count }} comentários</span>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <!-- Tab: Seguidores -->
+            <div class="tab-content" id="tab-seguidores" style="display:none;" role="tabpanel" aria-labelledby="tabBtn-seguidores">
+                {% if seguidores|length == 0 %}
+                    <div class="empty-state"><div class="empty-icon">👥</div><h3>Nenhum seguidor</h3><p>Publique e interaja para ganhar seguidores!</p></div>
+                {% endif %}
+                {% for s in seguidores %}
+                    <div class="follow-list-item">
+                        <div class="follow-avatar">{{ s.nome[0] | upper }}</div>
+                        <div class="follow-info">
+                            <a href="{{ url_for('ver_usuario', username=s.username) }}" class="follow-name">{{ s.nome }}</a>
+                            <span class="follow-username">@{{ s.username }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Tab: Seguindo -->
+            <div class="tab-content" id="tab-seguindo" style="display:none;" role="tabpanel" aria-labelledby="tabBtn-seguindo">
+                {% if seguindo|length == 0 %}
+                    <div class="empty-state"><div class="empty-icon">🔍</div><h3>Não está seguindo ninguém</h3><p>Encontre pessoas no feed!</p></div>
+                {% endif %}
+                {% for s in seguindo %}
+                    <div class="follow-list-item">
+                        <div class="follow-avatar">{{ s.nome[0] | upper }}</div>
+                        <div class="follow-info">
+                            <a href="{{ url_for('ver_usuario', username=s.username) }}" class="follow-name">{{ s.nome }}</a>
+                            <span class="follow-username">@{{ s.username }}</span>
+                        </div>
+                        <form action="{{ url_for('unfollow', user_id=s.id) }}" method="POST" style="margin:0;">
+                            <button type="submit" class="btn-unfollow-sm">Seguindo</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Tab: Solicitações -->
+            <div class="tab-content" id="tab-solicitacoes" style="display:none;" role="tabpanel" aria-labelledby="tab-btn-solicitacoes">
+                <div id="follow-requests-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">🔄</div>
+                        <h3>Carregando solicitações...</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Configurações -->
+            <div class="tab-content" id="tab-config" style="display:none;" role="tabpanel" aria-labelledby="tabBtn-config">
+                <div class="config-section">
+                    <h4>Privacidade</h4>
+                    <form action="{{ url_for('perfil') }}" method="POST">
+                        <input type="hidden" name="acao" value="toggle_privado">
+                        <div class="config-toggle-row">
+                            <div>
+                                <strong>Perfil Privado</strong>
+                                <p class="config-desc">Quando ativo, somente seus seguidores podem ver suas publicações.</p>
+                            </div>
+                            <button type="submit" class="toggle-btn {{ 'active' if current_user.perfil_privado else '' }}">
+                                {{ 'Ativo' if current_user.perfil_privado else 'Desativado' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="config-section">
+                    <h4>Tema</h4>
+                    <form action="{{ url_for('perfil') }}" method="POST">
+                        <input type="hidden" name="acao" value="mudar_tema">
+                        <div class="theme-options">
+                            <label class="theme-option {{ 'selected' if current_user.tema == 'claro' else '' }}">
+                                <input type="radio" name="tema" value="claro" {{ 'checked' if current_user.tema == 'claro' else '' }} onchange="this.form.submit()">
+                                <span class="theme-preview theme-light">☀️</span>
+                                <span>Claro</span>
+                            </label>
+                            <label class="theme-option {{ 'selected' if current_user.tema == 'escuro' else '' }}">
+                                <input type="radio" name="tema" value="escuro" {{ 'checked' if current_user.tema == 'escuro' else '' }} onchange="this.form.submit()">
+                                <span class="theme-preview theme-dark">🌙</span>
+                                <span>Escuro</span>
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="config-section">
+                    <h4>Links</h4>
+                    <div class="config-links">
+                        <a href="{{ url_for('privacidade') }}">📄 Política de Privacidade (LGPD)</a>
+                        <a href="{{ url_for('termos') }}">📋 Termos de Uso</a>
+                        <a href="{{ url_for('seguranca') }}">🛡️ Segurança</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+function showTab(name) {
+    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.profile-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+    });
+    document.getElementById('tab-' + name).style.display = 'block';
+    event.target.classList.add('active');
+    event.target.setAttribute('aria-selected', 'true');
+    if (name === 'solicitacoes') loadFollowRequests();
+}
+
+function loadFollowRequests() {
+    fetch('/follow-requests').then(r => r.json()).then(reqs => {
+        const container = document.getElementById('follow-requests-list');
+        if (reqs.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><h3>Nenhuma solicitação pendente</h3><p>Quando alguém solicitar seguir você, aparecerá aqui.</p></div>';
+            return;
+        }
+        container.innerHTML = reqs.map(r => `
+            <div class="follow-list-item" id="freq-${r.id}">
+                <div class="follow-avatar">${r.inicial}</div>
+                <div class="follow-info">
+                    <a href="/usuario/${r.username}" class="follow-name">${r.nome}</a>
+                    <span class="follow-username">@${r.username} · ${r.data}</span>
+                </div>
+                <div class="follow-request-actions">
+                    <button class="btn-accept" onclick="handleRequest(${r.id}, 'accept')">Aceitar</button>
+                    <button class="btn-reject" onclick="handleRequest(${r.id}, 'reject')">Recusar</button>
+                </div>
+            </div>
+        `).join('');
+    });
+}
+
+function handleRequest(reqId, action) {
+    fetch('/follow-request/' + reqId + '/' + action, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) {
+            const item = document.getElementById('freq-' + reqId);
+            if (item) {
+                item.style.opacity = '0.5';
+                item.innerHTML = '<p style="padding:12px;text-align:center;color:var(--text-muted);">' +
+                    (action === 'accept' ? '✅ Aceito' : '❌ Recusado') + '</p>';
+                setTimeout(() => item.remove(), 1500);
+            }
+            // Atualizar badge
+            const badge = document.querySelector('#tab-btn-solicitacoes .tab-badge');
+            if (badge) {
+                let count = parseInt(badge.innerText) - 1;
+                if (count <= 0) badge.remove();
+                else badge.innerText = count;
+            }
+        }
+    });
+}
+</script>
+</body>
+</html>

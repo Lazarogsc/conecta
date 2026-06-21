@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segurança | Conecta</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='logo.svg') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="legal-page">
+    <div class="legal-header">
+        <a href="{{ url_for('feed') }}" class="legal-back">← Voltar</a>
+        <h1>Segurança e Proteção</h1>
+        <p class="legal-subtitle">Baseado no Estatuto da Criança e do Adolescente (ECA – Lei nº 8.069/1990)</p>
+    </div>
+
+    <div class="legal-content">
+        <section>
+            <h2>1. Compromisso com a Proteção de Menores</h2>
+            <p>A <strong>Conecta</strong> tem como pilar fundamental a proteção de crianças e adolescentes na internet, em conformidade com o <strong>Estatuto da Criança e do Adolescente (ECA – Lei nº 8.069/1990)</strong> e o <strong>Marco Civil da Internet (Lei nº 12.965/2014)</strong>.</p>
+            <div class="legal-highlight">
+                <p>🛡️ <strong>"É dever de todos velar pela dignidade da criança e do adolescente, pondo-os a salvo de qualquer tratamento desumano, violento, aterrorizante, vexatório ou constrangedor."</strong> — Art. 18, ECA</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>2. Filtragem Automática de Conteúdo</h2>
+            <p>A Conecta utiliza um sistema de <strong>Inteligência Artificial híbrido</strong> para proteger menores de idade:</p>
+            
+            <div class="security-card">
+                <h3>🤖 Modelo Local (TF-IDF + Regressão Logística)</h3>
+                <p>Classificação rápida em tempo real. Analisa o texto antes da publicação e determina se o conteúdo é "seguro" ou "adulto".</p>
+            </div>
+
+
+            <ul>
+                <li>Todo conteúdo é analisado <strong>antes</strong> de ser publicado.</li>
+                <li>Menores de 18 anos <strong>nunca</strong> visualizam conteúdo classificado como "adulto".</li>
+                <li>Conteúdos adultos recebem badge visual (+18) para maiores de idade.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>3. Sistema de Punição para Menores</h2>
+            <p>Em conformidade com o <strong>Art. 17 do ECA</strong> (direito ao respeito e dignidade), a Conecta aplica as seguintes medidas educativas:</p>
+            
+            <table class="legal-table">
+                <thead>
+                    <tr>
+                        <th>Infração</th>
+                        <th>Punição</th>
+                        <th>Fundamento Legal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Menor tenta publicar conteúdo adulto</td>
+                        <td>Suspensão de 5 minutos</td>
+                        <td>Art. 17, ECA</td>
+                    </tr>
+                    <tr>
+                        <td>Conteúdo bloqueado pela IA</td>
+                        <td>Publicação impedida + notificação educativa</td>
+                        <td>Art. 241-D, ECA</td>
+                    </tr>
+                    <tr>
+                        <td>Reincidência</td>
+                        <td>Suspensões progressivas</td>
+                        <td>Art. 18, ECA</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>As punições são <strong>sempre acompanhadas de notificações educativas</strong>, explicando ao menor por que o conteúdo foi bloqueado e referenciando os artigos do ECA aplicáveis.</p>
+        </section>
+
+        <section>
+            <h2>4. Artigos do ECA Aplicáveis</h2>
+            <ul>
+                <li><strong>Art. 3º:</strong> A criança e o adolescente gozam de todos os direitos fundamentais inerentes à pessoa humana, assegurando-se-lhes oportunidades e facilidades para o desenvolvimento físico, mental, moral, espiritual e social.</li>
+                <li><strong>Art. 4º:</strong> É dever da família, da comunidade, da sociedade em geral e do Poder Público assegurar, com absoluta prioridade, a efetivação dos direitos referentes à vida, à saúde, à alimentação, à educação, ao esporte, ao lazer, à profissionalização, à cultura, à dignidade, ao respeito, à liberdade e à convivência familiar e comunitária.</li>
+                <li><strong>Art. 17:</strong> O direito ao respeito consiste na inviolabilidade da integridade física, psíquica e moral da criança e do adolescente.</li>
+                <li><strong>Art. 18:</strong> É dever de todos velar pela dignidade da criança e do adolescente, pondo-os a salvo de qualquer tratamento desumano, violento, aterrorizante, vexatório ou constrangedor.</li>
+                <li><strong>Art. 71:</strong> A criança e o adolescente têm direito a informação, cultura, lazer, esportes, diversões, espetáculos e produtos e serviços que respeitem sua condição peculiar de pessoa em desenvolvimento.</li>
+                <li><strong>Art. 241-D:</strong> Aliciar, assediar, instigar ou constranger, por qualquer meio de comunicação, criança, com o fim de com ela praticar ato libidinoso – Pena: reclusão de 1 a 3 anos.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>5. Proteção de Dados de Menores (LGPD)</h2>
+            <p>Em conformidade com o <strong>Art. 14 da LGPD</strong>:</p>
+            <ul>
+                <li>O tratamento de dados de crianças e adolescentes é realizado em seu <strong>melhor interesse</strong>.</li>
+                <li>Dados de menores de 12 anos só são coletados com <strong>consentimento específico e em destaque</strong> de pelo menos um dos pais/responsáveis.</li>
+                <li>A coleta é limitada ao <strong>estritamente necessário</strong> para a atividade.</li>
+                <li>Dados de menores não são compartilhados com terceiros sem consentimento.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>6. Dicas de Segurança para Usuários</h2>
+            <div class="security-tips">
+                <div class="tip-card">
+                    <span class="tip-icon">🔒</span>
+                    <div>
+                        <h4>Use senhas fortes</h4>
+                        <p>Combine letras maiúsculas, minúsculas, números e símbolos.</p>
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-icon">🚫</span>
+                    <div>
+                        <h4>Não compartilhe dados pessoais</h4>
+                        <p>Nunca publique endereço, telefone, escola ou documentos.</p>
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-icon">👀</span>
+                    <div>
+                        <h4>Cuidado com desconhecidos</h4>
+                        <p>Não aceite solicitações de pessoas que você não conhece pessoalmente.</p>
+                    </div>
+                </div>
+                <div class="tip-card">
+                    <span class="tip-icon">📢</span>
+                    <div>
+                        <h4>Denuncie conteúdo inadequado</h4>
+                        <p>Se encontrar algo que te deixe desconfortável, denuncie imediatamente.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>7. Canal de Denúncias</h2>
+            <p>Se você presenciar ou for vítima de qualquer situação inadequada na Conecta, utilize os seguintes canais:</p>
+            <ul>
+                <li>📧 <strong>E-mail:</strong> seguranca@conecta.app</li>
+                <li>📞 <strong>Disque 100:</strong> Canal nacional de denúncias de violações de direitos humanos contra crianças e adolescentes.</li>
+                <li>📞 <strong>Disque 181:</strong> Denúncia anônima de crimes.</li>
+                <li>🌐 <strong>SaferNet Brasil:</strong> <a href="https://new.safernet.org.br/denuncie" target="_blank">www.safernet.org.br/denuncie</a></li>
+            </ul>
+        </section>
+    </div>
+
+    <div class="legal-footer">
+        <a href="{{ url_for('privacidade') }}">Privacidade</a> • 
+        <a href="{{ url_for('termos') }}">Termos</a> • 
+        <a href="{{ url_for('feed') }}">Voltar ao Feed</a>
+    </div>
+</div>
+</body>
+</html>

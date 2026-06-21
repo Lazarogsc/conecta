@@ -1,0 +1,95 @@
+{
+  "modelos_cv_5fold": {
+    "Regressao Logistica (v4.0)": {
+      "Acurácia": 0.7618622740791581,
+      "F1-Weighted": 0.757181098548958
+    },
+    "Naive Bayes (Multinomial)": {
+      "Acurácia": 0.7725005719514986,
+      "F1-Weighted": 0.7653737805123256
+    },
+    "SVM (Linear)": {
+      "Acurácia": 0.7682910089224434,
+      "F1-Weighted": 0.7631565861447579
+    }
+  },
+  "bootstrap_1000_reglog": {
+    "recall_ic95": [
+      0.8766233766233766,
+      0.9617834394904459
+    ],
+    "precision_ic95": [
+      0.818168449197861,
+      0.921696526365201
+    ]
+  },
+  "mcnemar_p_value": 0.04326272780691071,
+  "threshold_sweep_sample": [
+    {
+      "threshold": 0.3,
+      "precision": 0.7931034482758621,
+      "recall": 0.8961038961038961,
+      "FP": 36
+    },
+    {
+      "threshold": 0.35,
+      "precision": 0.8535031847133758,
+      "recall": 0.8701298701298701,
+      "FP": 23
+    },
+    {
+      "threshold": 0.4,
+      "precision": 0.8951048951048951,
+      "recall": 0.8311688311688312,
+      "FP": 15
+    },
+    {
+      "threshold": 0.44999999999999996,
+      "precision": 0.9338842975206612,
+      "recall": 0.7337662337662337,
+      "FP": 8
+    },
+    {
+      "threshold": 0.5,
+      "precision": 0.9509803921568627,
+      "recall": 0.6298701298701299,
+      "FP": 5
+    },
+    {
+      "threshold": 0.55,
+      "precision": 0.9777777777777777,
+      "recall": 0.5714285714285714,
+      "FP": 2
+    },
+    {
+      "threshold": 0.6,
+      "precision": 0.9868421052631579,
+      "recall": 0.487012987012987,
+      "FP": 1
+    },
+    {
+      "threshold": 0.65,
+      "precision": 0.9824561403508771,
+      "recall": 0.36363636363636365,
+      "FP": 1
+    },
+    {
+      "threshold": 0.7,
+      "precision": 1.0,
+      "recall": 0.3051948051948052,
+      "FP": 0
+    },
+    {
+      "threshold": 0.75,
+      "precision": 1.0,
+      "recall": 0.2077922077922078,
+      "FP": 0
+    },
+    {
+      "threshold": 0.8,
+      "precision": 1.0,
+      "recall": 0.13636363636363635,
+      "FP": 0
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos de Uso | Conecta</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='logo.svg') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="legal-page">
+    <div class="legal-header">
+        <a href="{{ url_for('feed') }}" class="legal-back">← Voltar</a>
+        <h1>Termos de Uso</h1>
+        <p class="legal-subtitle">Última atualização: Março de 2026</p>
+    </div>
+
+    <div class="legal-content">
+        <section>
+            <h2>1. Aceitação dos Termos</h2>
+            <p>Ao criar uma conta na <strong>Conecta</strong>, você concorda com estes Termos de Uso. Se você for menor de 18 anos, declara que possui autorização de seus pais ou responsáveis legais para utilizar a plataforma, conforme previsto no <strong>Art. 14, §1º da LGPD</strong> e no <strong>Estatuto da Criança e do Adolescente (ECA)</strong>.</p>
+        </section>
+
+        <section>
+            <h2>2. Descrição do Serviço</h2>
+            <p>A Conecta é uma rede social que permite:</p>
+            <ul>
+                <li>Criação de perfil com nome, foto e idade.</li>
+                <li>Publicação de textos no feed.</li>
+                <li>Interação com outros usuários (curtidas, comentários, seguidores).</li>
+                <li>Visualização de conteúdo filtrado conforme faixa etária.</li>
+            </ul>
+            <p>A plataforma utiliza <strong>Inteligência Artificial</strong> para moderação automática de conteúdo, classificando publicações como "seguro" ou "adulto".</p>
+        </section>
+
+        <section>
+            <h2>3. Regras de Conduta</h2>
+            <p>Ao utilizar a Conecta, você se compromete a:</p>
+            <ul>
+                <li>✅ Fornecer informações verdadeiras no cadastro, incluindo sua idade real.</li>
+                <li>✅ Respeitar demais usuários e manter um ambiente saudável.</li>
+                <li>✅ Não publicar conteúdo que incite violência, ódio ou discriminação.</li>
+                <li>✅ Não publicar conteúdo sexual, pornográfico ou impróprio (especialmente se menor de 18 anos).</li>
+                <li>✅ Não utilizar a plataforma para assédio, bullying ou perseguição.</li>
+                <li>✅ Respeitar a propriedade intelectual de terceiros.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>4. Sistema de Moderação por IA</h2>
+            <p>A Conecta possui um sistema híbrido de moderação de conteúdo:</p>
+            <ul>
+                <li><strong>Modelo Local (TF-IDF + Regressão Logística):</strong> classificação rápida em tempo real com pipeline de 3 camadas (regex, ML, política conservadora).</li>
+            </ul>
+            <p>Todos os conteúdos são analisados <strong>antes</strong> da publicação. O sistema atua de forma automática e contínua.</p>
+        </section>
+
+        <section>
+            <h2>5. Punições e Sanções</h2>
+            <div class="legal-highlight">
+                <p>⚠️ <strong>Importante para menores de 18 anos:</strong></p>
+            </div>
+            <ul>
+                <li><strong>Tentativa de publicar conteúdo adulto:</strong> suspensão temporária de 5 minutos.</li>
+                <li>O conteúdo não é publicado – ele é bloqueado pelo sistema de IA.</li>
+                <li>O usuário recebe uma notificação explicando o motivo da punição.</li>
+                <li>Reincidências podem resultar em suspensões mais longas.</li>
+            </ul>
+            <p>Estas medidas visam proteger crianças e adolescentes conforme o <strong>Art. 17 do ECA</strong> (direito ao respeito e dignidade) e o <strong>Art. 241-D do ECA</strong> (proteção contra conteúdo impróprio).</p>
+        </section>
+
+        <section>
+            <h2>6. Propriedade Intelectual</h2>
+            <ul>
+                <li>O conteúdo publicado pelos usuários permanece de sua autoria.</li>
+                <li>Ao publicar, você concede à Conecta uma licença de uso para exibição na plataforma.</li>
+                <li>A marca "Conecta", logotipo e design da interface são propriedade da plataforma.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>7. Limitação de Responsabilidade</h2>
+            <ul>
+                <li>A Conecta não se responsabiliza por conteúdos publicados por terceiros que escapem da moderação automática.</li>
+                <li>A plataforma emprega seus melhores esforços para manter a segurança, mas não garante 100% de eficácia na filtragem.</li>
+                <li>Incentivamos que qualquer conteúdo inadequado seja denunciado pelos usuários.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>8. Encerramento de Conta</h2>
+            <p>Você pode solicitar o encerramento de sua conta a qualquer momento. Ao encerrar:</p>
+            <ul>
+                <li>Seus dados pessoais serão excluídos conforme a LGPD.</li>
+                <li>Publicações e interações poderão ser anonimizadas ou removidas.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>9. Alterações nos Termos</h2>
+            <p>A Conecta se reserva o direito de alterar estes Termos de Uso a qualquer momento. Alterações significativas serão comunicadas por notificação na plataforma.</p>
+        </section>
+    </div>
+
+    <div class="legal-footer">
+        <a href="{{ url_for('privacidade') }}">Privacidade</a> • 
+        <a href="{{ url_for('seguranca') }}">Segurança</a> • 
+        <a href="{{ url_for('feed') }}">Voltar ao Feed</a>
+    </div>
+</div>
+</body>
+</html>

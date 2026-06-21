@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post de {{ post.author.nome if post.author else 'Desconhecido' }} | Conecta</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='logo.svg') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="tema-{{ current_user.tema|default('claro') }}">
+
+<a href="#post-content" class="skip-link">Pular para o conteúdo principal</a>
+
+<div class="app-container">
+    <aside class="sidebar" role="complementary" aria-label="Menu lateral">
+        <a href="{{ url_for('feed') }}" class="brand" style="text-decoration:none;">
+            <img src="{{ url_for('static', filename='logo.svg') }}" class="brand-logo" alt="Logo da rede social Conecta">
+            <h2 class="brand-name">Conecta</h2>
+        </a>
+        <nav class="nav-menu" aria-label="Navegação principal">
+            <a href="{{ url_for('feed') }}" class="nav-item">
+                <div class="nav-icon-wrapper" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L4 9v12h5v-7h6v7h5V9l-8-6z"></path></svg></div>
+                <span>Início</span>
+            </a>
+            <a href="{{ url_for('perfil') }}" class="nav-item">
+                <div class="nav-icon-wrapper" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+                <span>Meu Perfil</span>
+            </a>
+        </nav>
+    </aside>
+
+    <header class="top-header" role="banner">
+        <a href="{{ url_for('feed') }}" class="btn-back-header">Voltar ao Feed</a>
+    </header>
+
+    <main class="feed-container" id="post-content" role="main">
+        <div class="feed-layout">
+            <div class="feed-main-col">
+                <article class="post-card">
+                    <div class="post-header">
+                        <div class="post-author-info">
+                            <div class="post-avatar">{{ post.author.nome[0] | upper if post.author else '?' }}</div>
+                            <div class="author-meta">
+                                <span class="post-author-name">
+                                    {% if post.author %}<a href="{{ url_for('ver_usuario', username=post.author.username) }}" style="color:inherit;text-decoration:none;">{{ post.author.nome }}</a>{% else %}Desconhecido{% endif %}
+                                </span>
+                                <span class="post-username-time">{% if post.author %}@{{ post.author.username }} · {% endif %}{{ post.data_publicacao | timeago }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="post-content"><p>{{ post.texto }}</p></div>
+
+                    <div class="post-stats">
+                        <div class="stat-item"><span id="likes-count-{{ post.id }}">{{ post.likes }}</span> curtidas</div>
+                        <div class="stat-item"><span id="comments-count-{{ post.id }}">{{ post.comments_count }}</span> comentários</div>
+                    </div>
+
+                    <div class="post-footer">
+                        <button class="interaction-btn btn-like {% if current_user.id in post.likes_users %}active{% endif %}" onclick="likePost({{ post.id }}, this)" aria-label="{% if current_user.id in post.likes_users %}Descurtir{% else %}Curtir{% endif %} publicação" aria-pressed="{% if current_user.id in post.likes_users %}true{% else %}false{% endif %}">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="{% if current_user.id in post.likes_users %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            <span>{% if current_user.id in post.likes_users %}Curtido{% else %}Curtir{% endif %}</span>
+                        </button>
+                    </div>
+
+                    <!-- Comments -->
+                    <div class="comments-section" style="display:block;" role="region" aria-label="Comentários da publicação">
+                        <div class="comment-composer">
+                            <div class="comment-avatar-sm" aria-hidden="true">{{ current_user.nome[0] | upper }}</div>
+                            <label for="comment-input-{{ post.id }}" class="sr-only">Escreva um comentário</label>
+                            <input type="text" class="comment-input" id="comment-input-{{ post.id }}" placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter')submitComment({{ post.id }})">
+                            <button class="comment-send-btn" onclick="submitComment({{ post.id }})" aria-label="Enviar comentário">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            </button>
+                        </div>
+                        <div class="comments-list" id="comments-list-{{ post.id }}" aria-live="polite"></div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+function likePost(postId, btn) {
+    fetch('/like/' + postId, { method: 'POST' }).then(r => r.json()).then(data => {
+        document.getElementById('likes-count-' + postId).innerText = data.likes;
+        const icon = btn.querySelector('svg'), span = btn.querySelector('span');
+        if (data.action === 'liked') { btn.classList.add('active'); icon.setAttribute('fill','currentColor'); span.innerText='Curtido'; }
+        else { btn.classList.remove('active'); icon.setAttribute('fill','none'); span.innerText='Curtir'; }
+    });
+}
+
+function submitComment(postId) {
+    const input = document.getElementById('comment-input-' + postId);
+    const texto = input.value.trim();
+    if (!texto) return;
+    const fd = new FormData(); fd.append('texto', texto);
+    fetch('/comment/' + postId, { method: 'POST', body: fd }).then(r => r.json()).then(data => {
+        if (data.error) { alert(data.error); return; }
+        input.value = '';
+        loadComments(postId);
+        document.getElementById('comments-count-' + postId).innerText = data.comments_count;
+    });
+}
+
+function loadComments(postId) {
+    fetch('/comments/' + postId).then(r => r.json()).then(comments => {
+        const list = document.getElementById('comments-list-' + postId);
+        if (!comments.length) { list.innerHTML = '<p class="no-comments">Seja o primeiro a comentar!</p>'; return; }
+        list.innerHTML = comments.map(c => `
+            <div class="comment-item">
+                <div class="comment-main">
+                    <div class="comment-avatar-sm">${c.author_inicial}</div>
+                    <div class="comment-body">
+                        <div class="comment-bubble">
+                            <span class="comment-author">${c.author_nome}</span>
+                            <p class="comment-text">${c.texto}</p>
+                        </div>
+                        <span class="comment-time">${c.data}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    });
+}
+
+loadComments({{ post.id }});
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{
+  "antigo_v3": {
+    "TP": 30,
+    "FP": 262,
+    "TN": 113,
+    "FN": 0,
+    "precision": 0.10273972602739725,
+    "recall": 1.0,
+    "specificity": 0.30133333333333334
+  },
+  "novo_v4": {
+    "TP": 27,
+    "FP": 21,
+    "TN": 354,
+    "FN": 3,
+    "precision": 0.5625,
+    "recall": 0.9,
+    "specificity": 0.944
+  },
+  "total_posts": 405,
+  "total_adulto_real": 30,
+  "fps_corrigidos_count": 242,
+  "fps_corrigidos_exemplos": [
+    {
+      "texto": "Bom dia pessoal! Mais uma segunda-feira chegou, bora trabalhar",
+      "grupo": "cotidiano_neutro"
+    },
+    {
+      "texto": "Alguém mais acordou com essa chuva maravilhosa hoje?",
+      "grupo": "cotidiano_neutro"
+    },
+    {
+      "texto": "Trânsito impossível hoje, 2 horas pra chegar no trabalho",
+      "grupo": "cotidiano_neutro"
+    },
+    {
+      "texto": "Finalmente sexta-feira!! Quem mais tava precisando?",
+      "grupo": "cotidiano_neutro"
+    },
+    {
+      "texto": "Achei uma cafeteria incrível aqui no centro, café nota 10",
+      "grupo": "cotidiano_neutro"
+    },
+    {
+      "texto": "Cozinhei um risoto de cogumelos pela primeira vez, ficou bom demais",
+      "grupo": "cotidiano_neutro"
+    },
+    {
+      "texto": "Meu cachorro destruiu mais um chinelo, já é o quinto esse mês",
+      "grupo": "cotidiano_neutro"
+    },
+    {
+      "texto": "Assistindo série nova na Netflix, tô viciada já",
+      "grupo": "cotidiano_neutro"
+    },
+    {
+      "texto": "Reunião de 3 horas que podia ter sido um email",
+      "grupo": "cotidiano_neutro"
+    },
+    {
+      "texto": "Que pôr do sol incrível hoje, tirei foto da varanda",
+      "grupo": "cotidiano_neutro"
+    }
+  ]
+}
